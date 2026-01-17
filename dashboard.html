@@ -6,16 +6,24 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Admin Dashboard</h1>
-<button id="logoutBtn">Logout</button>
 
-<table id="studentsTable">
-  <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
-</table>
+<div class="dashboard-container">
+    <button id="logoutBtn">Logout</button>
+    
+    <div class="brand-logo" style="font-size: 1.5rem; text-align: left;">English Studies</div>
+    <h1>Admin Dashboard</h1>
 
-<input type="text" id="newName" placeholder="Student Name">
-<input type="email" id="newEmail" placeholder="Email">
-<button id="addStudentBtn">Add Student</button>
+    <table id="studentsTable">
+      <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
+    </table>
+
+    <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <h3>Add New Student</h3>
+        <input type="text" id="newName" placeholder="Student Name">
+        <input type="email" id="newEmail" placeholder="Email Address">
+        <button id="addStudentBtn">Add Student</button>
+    </div>
+</div>
 
 <script type="module" src="firebase.js"></script>
 <script type="module" src="auth.js"></script>
