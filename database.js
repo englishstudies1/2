@@ -1,5 +1,5 @@
 import { db } from "./firebase.js";
-import { collection, addDoc, getDocs, doc, setDoc, onSnapshot, query, where, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, setDoc, onSnapshot, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Load Students with real-time sync
 export function loadStudents() {
@@ -45,4 +45,5 @@ export async function getTableData(group, elementId) {
     onSnapshot(doc(db, "settings", "timetable_" + group), (d) => {
         if(d.exists()) document.getElementById(elementId).innerHTML = d.data().content;
     });
+
 }
