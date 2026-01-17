@@ -2,18 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login | English Studies</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | English Studies Portal</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<div id="loginForm">
-  <div class="brand-logo">English Studies</div>
+
+<div id="loginForm" class="glass-card">
+  <div class="brand-logo">
+      <i class="fas fa-graduation-cap"></i>
+      <span>English Studies Portal</span>
+  </div>
   
+  <p style="text-align: center; margin-bottom: 20px; opacity: 0.8;">Student & Admin Login</p>
+
   <input type="email" id="email" placeholder="Email Address">
   <input type="password" id="password" placeholder="Password">
+  
   <button id="loginBtn">Login</button>
-  <button id="signupBtn">Sign Up</button>
+  <button id="signupBtn">Create New Account</button>
 </div>
+
+<footer>
+    <div style="margin-bottom: 10px; font-weight: bold; color: white;">
+        Mourad Project's @ 2026
+    </div>
+    <div class="small-note">
+        Registration is open for new academic year.<br>
+        Please contact admin if you lost your password.
+    </div>
+</footer>
 
 <script type="module" src="firebase.js"></script>
 <script type="module" src="auth.js"></script>
@@ -23,13 +42,15 @@ import { login, signup } from "./auth.js";
 document.getElementById("loginBtn").onclick = () => {
   const email = document.getElementById("email").value;
   const pass = document.getElementById("password").value;
-  login(email, pass);
+  if(email && pass) login(email, pass);
+  else alert("Please fill all fields");
 };
 
 document.getElementById("signupBtn").onclick = () => {
   const email = document.getElementById("email").value;
   const pass = document.getElementById("password").value;
-  signup(email, pass);
+  if(email && pass) signup(email, pass);
+  else alert("Enter email and password to sign up");
 };
 </script>
 </body>
