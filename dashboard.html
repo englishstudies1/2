@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard | English Studies</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+<button id="logoutBtn">Logout</button>
+
+<table id="studentsTable">
+  <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
+</table>
+
+<input type="text" id="newName" placeholder="Student Name">
+<input type="email" id="newEmail" placeholder="Email">
+<button id="addStudentBtn">Add Student</button>
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module" src="database.js"></script>
+<script type="module">
+import { protectPage, logout } from "./auth.js";
+import { addStudent, loadStudents } from "./database.js";
+
+protectPage();
+loadStudents();
+
+document.getElementById("logoutBtn").onclick = logout;
+document.getElementById("addStudentBtn").onclick = () => {
+  const name = document.getElementById("newName").value;
+  const email = document.getElementById("newEmail").value;
+  addStudent(name, email);
+};
+</script>
+</body>
+</html>

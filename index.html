@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login | English Studies</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="loginForm">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button id="loginBtn">Login</button>
+  <button id="signupBtn">Sign Up</button>
+</div>
+
+<script type="module" src="firebase.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module">
+import { login, signup } from "./auth.js";
+
+document.getElementById("loginBtn").onclick = () => {
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+  login(email, pass);
+};
+
+document.getElementById("signupBtn").onclick = () => {
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+  signup(email, pass);
+};
+</script>
+</body>
+</html>
