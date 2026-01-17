@@ -1,46 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard | English Studies</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8"><title>Admin Panel | Mourad Project</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<div class="dashboard-container">
-    <button id="logoutBtn">Logout</button>
-    
-    <div class="brand-logo" style="font-size: 1.5rem; text-align: left;">English Studies</div>
-    <h1>Admin Dashboard</h1>
+<div style="max-width: 1100px; margin: 20px auto; padding: 20px;">
+    <div class="glass-card">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+            <button id="logoutBtn" class="btn-primary" style="padding: 8px 20px;">Logout</button>
+        </header>
 
-    <table id="studentsTable">
-      <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
-    </table>
+        <div style="margin: 20px 0;">
+            <button class="tab-btn active" onclick="showTab('students')">Students</button>
+            <button class="tab-btn" onclick="showTab('modules')">Modules & Exams</button>
+            <button class="tab-btn" onclick="showTab('updates')">Announcements & Makeup</button>
+            <button class="tab-btn" onclick="showTab('timetable')">Timetable</button>
+        </div>
 
-    <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-        <h3>Add New Student</h3>
-        <input type="text" id="newName" placeholder="Student Name">
-        <input type="email" id="newEmail" placeholder="Email Address">
-        <button id="addStudentBtn">Add Student</button>
+        <div id="students-tab" class="tab-content">
+            <h3>Registered Students</h3>
+            <table id="studentsTable">
+                <thead><tr><th>Name</th><th>Email</th><th>Group</th><th>Action</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="modules-tab" class="tab-content" style="display:none;">
+            <h3>Add Lessons or Exams</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <select id="resType"><option value="lesson">Lesson / Module</option><option value="exam">Last Year Exam</option></select>
+                <select id="resSemester"><option value="S1">Semester 1 (7 Modules)</option><option value="S2">Semester 2 (7 Modules)</option></select>
+                <select id="resModule"></select>
+                <select id="resGroup"><option value="GR1">Group 1 (GR1)</option><option value="GR2">Group 2 (GR2)</option></select>
+                <input type="text" id="resTitle" placeholder="Title (e.g. Grammar Lecture 1)">
+                <input type="url" id="resLink" placeholder="Google Drive Link">
+            </div>
+            <button onclick="handleAddResource()" class="btn-admin" style="width:100%; margin-top:10px;">Upload Content</button>
+        </div>
+
+        <div id="updates-tab" class="tab-content" style="display:none;">
+            <div class="glass-card" style="margin-bottom: 20px;">
+                <h3>Post Announcement</h3>
+                <textarea id="annText" placeholder="Write something..."></textarea>
+                <select id="annGroup"><option value="ALL">All Groups</option><option value="GR1">GR1 Only</option><option value="GR2">GR2 Only</option></select>
+                <button onclick="handleAnnouncement()" class="btn-admin">Post</button>
+            </div>
+            <div class="glass-card">
+                <h3>Schedule Makeup Session</h3>
+                <input type="date" id="mkDate">
+                <select id="mkModule"></select>
+                <input type="text" id="mkLoc" placeholder="Room/Amphi Number">
+                <button onclick="handleMakeup()" class="btn-admin">Add Session</button>
+            </div>
+        </div>
+
+        <div id="timetable-tab" class="tab-content" style="display:none;">
+            <h3>Edit Timetable (Live HTML)</h3>
+            <p>Edit the tables below and save.</p>
+            <div id="editorGR1" contenteditable="true" style="background:white; color:black; padding:15px; border-radius:10px; margin-bottom:10px;"></div>
+            <button onclick="saveTime('GR1')" class="btn-admin">Save GR1</button>
+            <div id="editorGR2" contenteditable="true" style="background:white; color:black; padding:15px; border-radius:10px; margin-top:20px;"></div>
+            <button onclick="saveTime('GR2')" class="btn-admin">Save GR2</button>
+        </div>
     </div>
+
+    <footer>
+        Mourad Project's @ 2026<br>
+        Admins: Mourad, Hajar, Moneim, Samia, Mohamed
+    </footer>
 </div>
 
-<script type="module" src="firebase.js"></script>
-<script type="module" src="auth.js"></script>
-<script type="module" src="database.js"></script>
 <script type="module">
-import { protectPage, logout } from "./auth.js";
-import { addStudent, loadStudents } from "./database.js";
+    import { auth } from "./firebase.js";
+    import { protectPage, logout } from "./auth.js";
+    import { loadStudents, addResource, postAnn, addMakeup, saveTimetable, getTableData } from "./database.js";
 
-protectPage();
-loadStudents();
+    protectPage();
+    document.getElementById("logoutBtn").onclick = logout;
 
-document.getElementById("logoutBtn").onclick = logout;
-document.getElementById("addStudentBtn").onclick = () => {
-  const name = document.getElementById("newName").value;
-  const email = document.getElementById("newEmail").value;
-  addStudent(name, email);
-};
+    // Logic to switch tabs
+    window.showTab = (id) => {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id + '-tab').style.display = 'block';
+        event.target.classList.add('active');
+    };
+
+    // Populate Modules based on Semester
+    const s1 = ["Grammar 1", "Spoken English", "Guided Reading 1", "University Work Methodology", "Paragraph Writing", "Reading Comprehension", "Academic Vocabulary"];
+    const s2 = ["British American Civilization", "Oral Communication", "Composition", "Digital Culture", "Grammar 2", "Reading Comprehension 2", "Guided Reading 2"];
+
+    const modSelects = [document.getElementById('resModule'), document.getElementById('mkModule')];
+    document.getElementById('resSemester').onchange = (e) => {
+        const list = e.target.value === 'S1' ? s1 : s2;
+        modSelects.forEach(s => {
+            s.innerHTML = list.map(m => `<option>${m}</option>`).join('');
+        });
+    };
+    document.getElementById('resSemester').dispatchEvent(new Event('change'));
+
+    // Loading Data
+    loadStudents();
+    getTableData('GR1', 'editorGR1');
+    getTableData('GR2', 'editorGR2');
+
+    // Action Handlers
+    window.handleAddResource = () => {
+        const data = {
+            type: document.getElementById('resType').value,
+            sem: document.getElementById('resSemester').value,
+            mod: document.getElementById('resModule').value,
+            group: document.getElementById('resGroup').value,
+            title: document.getElementById('resTitle').value,
+            link: document.getElementById('resLink').value
+        };
+        addResource(data).then(() => alert("Content Added!"));
+    };
 </script>
 </body>
 </html>

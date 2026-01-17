@@ -1,38 +1,48 @@
-// database.js
 import { db } from "./firebase.js";
-import { collection, addDoc, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, setDoc, onSnapshot, query, where, deleteDoc } from "firebase/firestore";
 
-// Add a student
-export async function addStudent(name, email) {
-  try {
-    await addDoc(collection(db, "students"), { name, email });
-    alert("Student added successfully!");
-    loadStudents(); // Refresh the table
-  } catch(e) { console.error(e); }
+// Load Students with real-time sync
+export function loadStudents() {
+    const tbody = document.querySelector("#studentsTable tbody");
+    onSnapshot(collection(db, "users"), (snapshot) => {
+        tbody.innerHTML = "";
+        snapshot.forEach(d => {
+            const u = d.data();
+            if(u.role === 'admin') return;
+            tbody.innerHTML += `<tr>
+                <td>${u.fname} ${u.lname}</td>
+                <td>${u.email}</td>
+                <td>${u.group}</td>
+                <td><button onclick="deleteStudent('${d.id}')" style="color:red">Delete</button></td>
+            </tr>`;
+        });
+    });
 }
 
-// Delete a student
-export async function deleteStudent(studentId) {
-  try {
-    await deleteDoc(doc(db, "students", studentId));
-    alert("Student deleted!");
-    loadStudents();
-  } catch(e) { console.error(e); }
+// Add Resource (Lesson or Exam)
+export async function addResource(data) {
+    const colName = data.type === 'lesson' ? "lessons" : "exams";
+    await addDoc(collection(db, colName), {
+        ...data,
+        createdAt: new Date()
+    });
 }
 
-// Load all students into the table
-export async function loadStudents() {
-  const table = document.getElementById("studentsTable");
-  table.innerHTML = ""; // Clear table
-  const querySnapshot = await getDocs(collection(db, "students"));
-  querySnapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    const row = table.insertRow();
-    row.insertCell(0).innerText = data.name;
-    row.insertCell(1).innerText = data.email;
-    const delBtn = document.createElement("button");
-    delBtn.innerText = "Delete";
-    delBtn.onclick = () => deleteStudent(docSnap.id);
-    row.insertCell(2).appendChild(delBtn);
-  });
+// Announcements
+export async function postAnn(text, group) {
+    await addDoc(collection(db, "announcements"), {
+        text, group, date: new Date().toLocaleDateString()
+    });
+}
+
+// Timetable Persistence
+export async function saveTimetable(group, html) {
+    await setDoc(doc(db, "settings", "timetable_" + group), { content: html });
+    alert("Timetable Saved!");
+}
+
+export async function getTableData(group, elementId) {
+    onSnapshot(doc(db, "settings", "timetable_" + group), (d) => {
+        if(d.exists()) document.getElementById(elementId).innerHTML = d.data().content;
+    });
 }
