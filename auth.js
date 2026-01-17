@@ -1,8 +1,7 @@
 // auth.js
 import { auth } from "./firebase.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";// Sign up a new user
 
-// Sign up a new user
 export function signup(email, password) {
   createUserWithEmailAndPassword(auth, email, password)
     .then(() => alert("Successfully signed up!"))
@@ -32,3 +31,4 @@ export function protectPage() {
 export function logout() {
   signOut(auth).then(() => window.location.href = "index.html");
 }
+
